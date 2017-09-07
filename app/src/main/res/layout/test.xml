@@ -8,8 +8,10 @@
 
     <LinearLayout
         android:id="@+id/globalLayer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="624dp"
+        android:layout_height="296dp"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp">
 
         <LinearLayout
             android:id="@+id/leftLayer"
