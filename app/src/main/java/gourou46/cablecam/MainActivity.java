@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -66,6 +65,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         camera.setOnClickListener(this);
         isCameraOn=true;
         camera.setImageResource(R.drawable.camera_on);
+
+        potardVitesse=(SeekBar)findViewById(R.id.potardVitesse);
+        potardVitesse.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                potardVitesse.setProgress(50);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                potardVitesse.setProgress(50);
+            }
+        });
     }
 
     public void setHighBrightness(){

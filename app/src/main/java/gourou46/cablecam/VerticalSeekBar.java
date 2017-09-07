@@ -66,4 +66,6 @@ public class VerticalSeekBar extends SeekBar {
         }
         return true;
     }
+
+
 }
