@@ -75,12 +75,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                potardVitesse.setProgress(50);
+                vibrate(50);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 potardVitesse.setProgress(50);
+                vibrate(50);
             }
         });
     }
