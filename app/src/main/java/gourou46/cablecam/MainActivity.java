@@ -9,6 +9,7 @@ import android.os.Vibrator;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -17,7 +18,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements Orientation.Listener, View.OnClickListener{
     private ContentResolver cResolver;
     private SeekBar potardVitesse = null;
     private ImageView camera = null;
@@ -26,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView sensor = null;
     private boolean isCameraOn;
     private boolean isSensorOn;
+    public static boolean btActivated=false;
+
+    private Orientation mOrientation;
 
     private BluetoothSerial bluetoothSerial;
     private String deviceNamePrefix="HC-06";
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onReceive(Context context, Intent intent) {
             Toast toast = Toast.makeText(getApplicationContext(), "Déconnecté du périphérique Bluetooth !", Toast.LENGTH_SHORT);
+            btActivated=false;
         }
     };
 
@@ -56,12 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     sensor.setImageResource(R.drawable.gyro_on);
                 }
                 vibrate(50);
-                byte[] buffer = "ABCDEFGHIJKLMOPQRSTUVWXYZ".getBytes();
-                try {
-                    bluetoothSerial.write(buffer);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 break;
 
             case R.id.camera:
@@ -129,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LocalBroadcastManager.getInstance(this).registerReceiver(bluetoothDisconnectReceiver, new IntentFilter(BluetoothSerial.BLUETOOTH_DISCONNECTED));
         //Fired when connection can not be established, after 30 attempts.
         LocalBroadcastManager.getInstance(this).registerReceiver(bluetoothDisconnectReceiver, new IntentFilter(BluetoothSerial.BLUETOOTH_FAILED));
+
+        mOrientation = new Orientation(this);
     }
 
     protected void onResume() {
@@ -148,5 +149,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void vibrate(int n) {
         Vibrator vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vi.vibrate(n);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mOrientation.startListening(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mOrientation.stopListening();
+    }
+
+    @Override
+    public void onOrientationChanged(float pitch, float roll) {
+
+        if (btActivated && isSensorOn){
+            int intPitch = (int)pitch/2;
+            int intRoll = (int)roll/2;
+            if(intPitch>45) intPitch=45;
+            if(intPitch<-45) intPitch=-45;
+            if(intRoll>45) intRoll=45;
+            if(intRoll<-45) intRoll=-45;
+            intRoll+=90;
+            intPitch+=90;
+
+            byte[] buffer = ("P"+String.valueOf(intPitch)+"\n").getBytes();
+            byte[] buffer2 = ("R"+String.valueOf(intRoll)+"\n").getBytes();
+            try {
+                bluetoothSerial.write(buffer);
+                bluetoothSerial.write(buffer2);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -166,7 +166,7 @@ public class BluetoothSerial {
 
 									connected = true;
 									Log.i(BMX_BLUETOOTH,"Connected to " + device.getName());
-
+									MainActivity.btActivated=true;
 									return device;
 								} catch (Exception e) {
 									serialSocket = null;
@@ -338,7 +338,7 @@ public class BluetoothSerial {
 	public void close() {
 		
 		connected = false;
-		
+		MainActivity.btActivated=false;
 		if (serialReader != null) {
 			serialReader.interrupt();
 		
